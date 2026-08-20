@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Preview — SME AI Marketing{% endblock %}
+
+{% block content %}
+<div style="max-width:900px;margin:0 auto;">
+
+  <div class="hero">
+    <div class="hero-eye">Step 2 of 3</div>
+    <h1 class="hero-title">Data Preview</h1>
+    <p class="hero-sub">{{ filename }} — {{ "{:,}".format(rows) }} rows detected. Review your data below then select your target column for analysis.</p>
+  </div>
+
+  <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px;">
+    <div class="stat-card">
+      <div class="stat-label">Total Rows</div>
+      <div class="stat-value">{{ "{:,}".format(rows) }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Columns</div>
+      <div class="stat-value">{{ cols|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Numeric Columns</div>
+      <div class="stat-value">{{ numerics|length }}</div>
+    </div>
+  </div>
+
+  <div class="section-title">First 5 Rows Preview</div>
+  <div class="card" style="padding:0;overflow-x:auto;margin-bottom:24px;">
+    <table>
+      <thead>
+        <tr>
+          {% for col in cols %}
+          <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in preview %}
+        <tr>
+          {% for col in cols %}
+          <td>{{ row[col] }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Column Information</div>
+  <div class="card" style="padding:0;overflow:hidden;margin-bottom:24px;">
+    <table>
+      <thead>
+        <tr>
+          <th>Column Name</th>
+          <th>Data Type</th>
+          <th>Missing Values</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for col in cols %}
+        <tr>
+          <td style="font-weight:500;">{{ col }}</td>
+          <td><span class="badge {% if 'int' in dtypes[col] or 'float' in dtypes[col] %}badge-green{% else %}badge-blue{% endif %}">{{ dtypes[col] }}</span></td>
+          <td>{{ missing[col] }}</td>
+          <td>
+            {% if missing[col] == 0 %}
+            <span class="badge badge-green">✓ Clean</span>
+            {% else %}
+            <span class="badge badge-warn">⚠ Has missing</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Select Target Column for Analysis</div>
+  <div class="card" style="margin-bottom:24px;">
+    <p style="font-size:13px;color:var(--dim);margin-bottom:16px;line-height:1.6;">
+      Select the main metric you want to predict or analyse — e.g. ROI, Revenue, Conversion_Rate. The AI will identify which other columns best predict this value.
+    </p>
+    <form method="POST" action="/analyze">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;">
+        <div>
+          <label style="font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:8px;">Target Column</label>
+          <select name="target_col" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;">
+            {% for col in numerics %}
+            <option value="{{ col }}" {% if 'roi' in col.lower() or 'revenue' in col.lower() %}selected{% endif %}>{{ col }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" style="padding:10px 28px;background:var(--accent);color:#0B1220;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;">
+          Run AI Analysis →
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div style="text-align:center;">
+    <a href="/upload" style="font-size:13px;color:var(--dim);text-decoration:none;">
+      ← Upload different file
+    </a>
+  </div>
+
+</div>
+{% endblock %}

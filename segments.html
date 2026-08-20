@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% set page = "segments" %}
+{% block title %}Customer Segments — SME AI Marketing{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <div class="hero-eye">Model 2 — K-Means Clustering</div>
+  <h1 class="hero-title">Customer Segments</h1>
+  <p class="hero-sub">K-Means algorithm identified 8 distinct customer groups from {{ "{:,}".format(total) }} records. Silhouette Score: 0.1255 (K=8).</p>
+</div>
+
+<div class="section-title">Segment Overview</div>
+<div class="chart-grid" style="margin-bottom:32px;">
+  <div class="chart-wrap">
+    <div class="chart-title">Segment Size Distribution</div>
+    <canvas id="pieChart"></canvas>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Average ROI by Segment</div>
+    <canvas id="roiChart"></canvas>
+  </div>
+</div>
+
+<div class="section-title">Segment Details &amp; Marketing Recommendations</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+{% for seg in segments %}
+<div class="card" style="border-left:3px solid {{ seg.color }};">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+    <div>
+      <div style="font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Segment {{ seg.id }}</div>
+      <div style="font-size:16px;font-weight:600;color:{{ seg.color }};">{{ seg.name }}</div>
+    </div>
+    <span class="badge badge-blue">{{ seg.pct }}%</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+    <div style="background:var(--surface2);border-radius:8px;padding:8px;text-align:center;">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:2px;">Avg ROI</div>
+      <div style="font-size:16px;font-weight:600;">{{ seg.avg_roi }}</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:8px;text-align:center;">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:2px;">Avg Clicks</div>
+      <div style="font-size:16px;font-weight:600;">{{ seg.avg_clicks }}</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:8px;text-align:center;">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:2px;">Avg Cost</div>
+      <div style="font-size:13px;font-weight:600;">${{ "{:,}".format(seg.avg_cost) }}</div>
+    </div>
+  </div>
+  <div style="background:rgba(77,163,255,.07);border-radius:8px;padding:10px;font-size:12px;color:var(--dim);line-height:1.6;">
+    <strong style="color:var(--accent2);">→ Action:</strong> {{ seg.tip }}
+  </div>
+</div>
+{% endfor %}
+</div>
+
+<script>
+const pd = {{ pie_data | safe }};
+const bd = {{ bar_data | safe }};
+
+new Chart(document.getElementById('pieChart'),{
+  type:'doughnut',
+  data:{labels:pd.labels, datasets:[{data:pd.values, backgroundColor:pd.colors, borderWidth:0}]},
+  options:{
+    responsive:true, maintainAspectRatio:true,
+    plugins:{legend:{position:'right',labels:{color:'#8C9AB8',font:{size:11}}}}
+  }
+});
+
+new Chart(document.getElementById('roiChart'),{
+  type:'bar',
+  data:{labels:bd.labels, datasets:[{data:bd.values, backgroundColor:bd.colors, borderRadius:6}]},
+  options:{
+    responsive:true, maintainAspectRatio:true,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{color:'#8C9AB8',font:{size:10}},grid:{color:'#1a2a44'}},
+      y:{ticks:{color:'#8C9AB8',font:{size:10}},grid:{color:'#1a2a44'}}
+    }
+  }
+});
+</script>
+{% endblock %}

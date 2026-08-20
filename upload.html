@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Upload Data — SME AI Marketing{% endblock %}
+
+{% block content %}
+<div style="max-width:600px;margin:60px auto;">
+
+  <div class="hero">
+    <div class="hero-eye">Step 1 of 3</div>
+    <h1 class="hero-title">Upload Your Marketing Data</h1>
+    <p class="hero-sub">Upload a CSV file containing your campaign data. Our AI will automatically detect columns and run analysis.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:24px;">
+    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+
+      <div id="dropZone" style="border:2px dashed var(--border);border-radius:12px;padding:48px 24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:20px;"
+           onclick="document.getElementById('fileInput').click()"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor='var(--border)'"
+           ondrop="handleDrop(event)">
+        <div style="font-size:40px;margin-bottom:12px;">📂</div>
+        <div style="font-size:15px;font-weight:500;margin-bottom:6px;">Click to browse or drag & drop</div>
+        <div style="font-size:13px;color:var(--dim);">CSV files only • Any size</div>
+        <input type="file" id="fileInput" name="file" accept=".csv" style="display:none" onchange="showFile(this)">
+      </div>
+
+      <div id="fileInfo" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">📄</span>
+        <div>
+          <div id="fileName" style="font-size:14px;font-weight:500;"></div>
+          <div id="fileSize" style="font-size:12px;color:var(--dim);margin-top:2px;"></div>
+        </div>
+      </div>
+
+      <button type="submit" id="uploadBtn" style="width:100%;padding:14px;background:var(--accent);color:#0B1220;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;">
+        Upload & Analyse →
+      </button>
+
+    </form>
+  </div>
+
+  <div class="card">
+    <div style="font-size:13px;font-weight:500;margin-bottom:12px;color:var(--text);">📋 CSV Format Tips</div>
+    <div style="font-size:13px;color:var(--dim);line-height:1.8;">
+      ✅ First row should be column headers<br>
+      ✅ Include numeric columns for best analysis<br>
+      ✅ Columns like ROI, Clicks, Conversion_Rate work great<br>
+      ✅ Minimum 10 rows of data required<br>
+      ✅ Any marketing data format accepted
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+      <div style="font-size:12px;color:var(--dim);margin-bottom:8px;">Example columns that work well:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        {% for col in ['Campaign_Type','ROI','Clicks','Conversion_Rate','Acquisition_Cost','Impressions','Engagement_Score','Channel_Used'] %}
+        <span style="background:rgba(77,163,255,.1);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;">{{ col }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px;">
+    <a href="/demo" style="font-size:13px;color:var(--dim);text-decoration:none;">
+      No data? → <span style="color:var(--accent);">Try demo dataset instead</span>
+    </a>
+  </div>
+
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+  <div style="position:fixed;bottom:24px;right:24px;background:{% if category=='error' %}#e74c3c{% else %}#2ecc71{% endif %};color:white;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:999;">
+    {{ message }}
+  </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+<script>
+function showFile(input) {
+  if (input.files && input.files[0]) {
+    const f    = input.files[0];
+    const size = (f.size/1024).toFixed(1) + ' KB';
+    document.getElementById('fileName').textContent = f.name;
+    document.getElementById('fileSize').textContent = size;
+    document.getElementById('fileInfo').style.display = 'flex';
+    document.getElementById('dropZone').style.borderColor = 'var(--accent)';
+  }
+}
+function handleDrop(e) {
+  e.preventDefault();
+  const dt = e.dataTransfer;
+  if (dt.files.length) {
+    document.getElementById('fileInput').files = dt.files;
+    showFile(document.getElementById('fileInput'));
+  }
+}
+document.getElementById('uploadForm').addEventListener('submit', function() {
+  document.getElementById('uploadBtn').textContent = 'Analysing... ⏳';
+  document.getElementById('uploadBtn').disabled = true;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Home — SME AI Marketing{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;margin:80px auto;text-align:center;">
+
+  <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#4DA3FF,#7CE3C1);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:28px;font-weight:700;color:#0B1220;">AI</div>
+
+  <h1 style="font-size:36px;font-weight:700;letter-spacing:-.02em;margin-bottom:12px;">SME Marketing Intelligence</h1>
+  <p style="font-size:16px;color:var(--dim);max-width:520px;margin:0 auto 48px;line-height:1.7;">
+    Upload your marketing campaign data and get instant AI-powered insights — customer segments, ROI predictions, and campaign performance analysis.
+  </p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px;text-align:left;">
+    <div class="card">
+      <div style="font-size:24px;margin-bottom:10px;">📊</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Upload Your Data</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.6;">Upload any CSV file with your marketing campaign data — our AI automatically detects and analyses your columns.</div>
+    </div>
+    <div class="card">
+      <div style="font-size:24px;margin-bottom:10px;">🤖</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">AI Analysis</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.6;">K-Means segmentation, Random Forest prediction and feature importance — all computed automatically on your data.</div>
+    </div>
+    <div class="card">
+      <div style="font-size:24px;margin-bottom:10px;">🎯</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Customer Segments</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.6;">Discover distinct customer groups in your data with actionable marketing recommendations for each segment.</div>
+    </div>
+    <div class="card">
+      <div style="font-size:24px;margin-bottom:10px;">📈</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Performance Insights</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.6;">Understand which features drive your best results and identify top and bottom performing campaigns.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+    <a href="/upload" style="display:inline-block;padding:14px 32px;background:var(--accent);color:#0B1220;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;">
+      Upload Your CSV →
+    </a>
+    <a href="/demo" style="display:inline-block;padding:14px 32px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;text-decoration:none;font-weight:500;font-size:15px;">
+      View Demo Dataset
+    </a>
+  </div>
+
+  <p style="margin-top:32px;font-size:12px;color:var(--dim);">
+    Research Prototype — KIU University | A.S.D. Ishara Lakmali Gunathilaka | ID: 15018
+  </p>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+  <div style="position:fixed;bottom:24px;right:24px;background:{% if category=='error' %}#e74c3c{% else %}#2ecc71{% endif %};color:white;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;">
+    {{ message }}
+  </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+{% endblock %}

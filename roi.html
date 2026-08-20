@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% set page = "roi" %}
+{% block title %}ROI Analysis — SME AI Marketing{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <div class="hero-eye">Model 1 — ROI Prediction</div>
+  <h1 class="hero-title">ROI Analysis</h1>
+  <p class="hero-sub">Linear Regression &amp; Random Forest models trained on 12 features across 10,000 campaign records.</p>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">Average ROI</div>
+    <div class="stat-value">{{ avg_roi }}<span>x</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Maximum ROI</div>
+    <div class="stat-value">{{ max_roi }}<span>x</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Minimum ROI</div>
+    <div class="stat-value">{{ min_roi }}<span>x</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Best Model R²</div>
+    <div class="stat-value" style="font-size:20px;">-0.0023</div>
+    <div class="stat-sub">Linear Regression</div>
+  </div>
+</div>
+
+<div class="section-title">ROI by Campaign Type &amp; Channel</div>
+<div class="chart-grid">
+  <div class="chart-wrap">
+    <div class="chart-title">Average ROI by Campaign Type</div>
+    <canvas id="typeChart"></canvas>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Average ROI by Channel Used</div>
+    <canvas id="channelChart"></canvas>
+  </div>
+</div>
+
+<div class="section-title">Feature Importance &amp; ROI Distribution</div>
+<div class="chart-grid">
+  <div class="chart-wrap">
+    <div class="chart-title">Feature Importance — Random Forest</div>
+    <canvas id="featChart"></canvas>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">ROI Distribution across Campaigns</div>
+    <canvas id="distChart"></canvas>
+  </div>
+</div>
+
+<div class="section-title">Research Finding</div>
+<div class="card" style="border-left:3px solid var(--warn);">
+  <p style="font-size:13.5px;color:var(--dim);line-height:1.8;">
+    <strong style="color:var(--text);">Why is R² negative?</strong> The near-zero and negative R² scores
+    are a <em>substantive research finding</em> — not a model failure.
+    They indicate that structured campaign metrics alone cannot reliably predict SME marketing ROI,
+    because external factors (market sentiment, competitor behaviour, seasonality) dominate outcomes.
+    <br><br>
+    <strong style="color:var(--accent);">What this means for SMEs:</strong>
+    Budget allocation decisions should not rely solely on past campaign data.
+    A multi-source AI framework incorporating social listening, competitor tracking, and seasonal signals is required.
+  </p>
+</div>
+
+<script>
+const d = {{ data | safe }};
+const COLORS = ['#4DA3FF','#7CE3C1','#F4A93B','#e74c3c','#9b59b6','#1abc9c','#e67e22','#34495e'];
+const opts = (title) => ({
+  responsive:true, maintainAspectRatio:true,
+  plugins:{ legend:{display:false} },
+  scales:{
+    x:{ ticks:{color:'#8C9AB8',font:{size:11}}, grid:{color:'#1a2a44'} },
+    y:{ ticks:{color:'#8C9AB8',font:{size:11}}, grid:{color:'#1a2a44'} }
+  }
+});
+
+new Chart(document.getElementById('typeChart'),{
+  type:'bar',
+  data:{ labels:d.roi_types.labels,
+         datasets:[{data:d.roi_types.values, backgroundColor:COLORS, borderRadius:6}]},
+  options:opts()
+});
+
+new Chart(document.getElementById('channelChart'),{
+  type:'bar',
+  data:{ labels:d.roi_channels.labels,
+         datasets:[{data:d.roi_channels.values, backgroundColor:'#4DA3FF', borderRadius:6}]},
+  options:opts()
+});
+
+new Chart(document.getElementById('featChart'),{
+  type:'bar',
+  data:{ labels:d.feature_importance.labels,
+         datasets:[{data:d.feature_importance.values, backgroundColor:'#7CE3C1', borderRadius:4}]},
+  options:{
+    indexAxis:'y', responsive:true, maintainAspectRatio:true,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{color:'#8C9AB8',font:{size:10}},grid:{color:'#1a2a44'}},
+      y:{ticks:{color:'#8C9AB8',font:{size:10}},grid:{display:false}}
+    }
+  }
+});
+
+new Chart(document.getElementById('distChart'),{
+  type:'bar',
+  data:{ labels:d.roi_dist.labels,
+         datasets:[{data:d.roi_dist.values, backgroundColor:'#F4A93B', borderRadius:6}]},
+  options:opts()
+});
+</script>
+{% endblock %}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SME AI Marketing{% endblock %}</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0B1220; --surface: #111B2E; --surface2: #16223A;
+    --border: #233252; --accent: #4DA3FF; --accent2: #7CE3C1;
+    --text: #E7ECF6; --dim: #8C9AB8; --warn: #F4A93B;
+    --danger: #e74c3c; --success: #2ecc71;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; }
+
+  nav {
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:0 48px; display:flex; align-items:center;
+    justify-content:space-between; height:60px;
+    position:sticky; top:0; z-index:100;
+  }
+  .nav-brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
+  .nav-logo {
+    width:34px; height:34px; border-radius:8px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:16px; color:#0B1220;
+  }
+  .nav-title { font-size:15px; font-weight:600; color:var(--text); }
+  .nav-links { display:flex; gap:4px; align-items:center; }
+  .nav-link {
+    padding:6px 14px; border-radius:8px; text-decoration:none;
+    font-size:13px; color:var(--dim); transition:all .15s;
+  }
+  .nav-link:hover { background:var(--surface2); color:var(--text); }
+  .nav-link.active { background:rgba(77,163,255,.15); color:var(--accent); font-weight:500; }
+  .nav-upload {
+    padding:6px 16px; border-radius:8px; text-decoration:none;
+    font-size:13px; font-weight:600; color:#0B1220;
+    background:var(--accent); transition:all .15s;
+  }
+  .nav-badge {
+    font-size:10px; background:rgba(124,227,193,.15);
+    color:var(--accent2); padding:2px 7px; border-radius:20px;
+    font-weight:600; margin-left:4px;
+  }
+
+  main { padding:40px 48px 80px; max-width:1280px; margin:0 auto; }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px; }
+  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+  .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; }
+  .stat-label { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+  .stat-value { font-size:26px; font-weight:600; letter-spacing:-.02em; }
+  .stat-value span { font-size:15px; color:var(--accent2); font-weight:500; }
+  .stat-sub { font-size:12px; color:var(--dim); margin-top:4px; }
+
+  .section-title {
+    font-size:12px; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--dim); margin:40px 0 16px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .chart-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px; }
+  .chart-title { font-size:13px; font-weight:500; margin-bottom:16px; color:var(--text); }
+  canvas { max-height:280px; }
+
+  .hero { margin-bottom:32px; }
+  .hero-eye { font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--accent2); font-weight:600; margin-bottom:8px; }
+  .hero-title { font-size:28px; font-weight:600; letter-spacing:-.02em; }
+  .hero-sub { margin-top:10px; color:var(--dim); font-size:14px; max-width:600px; line-height:1.6; }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; padding:10px 14px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dim); border-bottom:1px solid var(--border); }
+  td { padding:12px 14px; border-bottom:1px solid var(--border); color:var(--text); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:var(--surface2); }
+
+  .badge { display:inline-block; font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; }
+  .badge-green { background:rgba(46,204,113,.12); color:#2ecc71; }
+  .badge-red   { background:rgba(231,76,60,.12);  color:#e74c3c; }
+  .badge-blue  { background:rgba(77,163,255,.12); color:var(--accent); }
+  .badge-warn  { background:rgba(244,169,59,.12); color:var(--warn); }
+
+  @media(max-width:900px){
+    .stat-grid{grid-template-columns:1fr 1fr}
+    .chart-grid{grid-template-columns:1fr}
+    nav,main{padding-left:20px;padding-right:20px}
+    .nav-title{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">
+    <div class="nav-logo">AI</div>
+    <span class="nav-title">SME Marketing Intelligence</span>
+  </a>
+  <div class="nav-links">
+    <a href="/" class="nav-link {% if page=='home' %}active{% endif %}">Home</a>
+    <a href="/demo" class="nav-link {% if page=='demo' %}active{% endif %}">Demo Dashboard</a>
+    <a href="/demo/roi" class="nav-link {% if page=='roi' %}active{% endif %}">ROI Analysis</a>
+    <a href="/demo/segments" class="nav-link {% if page=='segments' %}active{% endif %}">Segments</a>
+    <a href="/demo/campaigns" class="nav-link {% if page=='campaigns' %}active{% endif %}">Campaigns</a>
+    <a href="/upload" class="nav-upload">Upload Data →</a>
+    <span class="nav-badge">● Live</span>
+  </div>
+</nav>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>
